@@ -5,6 +5,8 @@ import 'package:worker/screen/choosefun.dart';
 import '../widgets/donebtn.dart';
 import './HirerHome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import './WorkerHome.dart';
 
 class MainPage extends StatefulWidget {
   static final mainRoute='/home';
@@ -102,7 +104,13 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     Future(() async{
       if(await FirebaseAuth.instance.currentUser!=null){
-        Navigator.of(context).pushReplacementNamed(Profile.profileRoute);
+        if(FirebaseFirestore.instance.collection('Worker').doc(FirebaseAuth.instance.currentUser.uid).get()!=null){
+          print("inside not");
+          Navigator.of(context).pushReplacementNamed(WorkerHome.workerhomerout);
+        }else{
+          print("not else");
+          Navigator.of(context).pushReplacementNamed(Profile.profileRoute);
+        }
       }
     });
   }

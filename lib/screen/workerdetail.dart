@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../model/reqModal.dart';
 import '../model/hirer.dart';
 import '../model/databaseServices.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class WorkerDetailScreen extends StatefulWidget {
   static final workerdetail = '/workerdetail';
@@ -16,18 +17,49 @@ class WorkerDetailScreen extends StatefulWidget {
 class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
   DateTime pickedDate;
   Hirer curHirer;
+  FlutterLocalNotificationsPlugin fltrNotification;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     pickedDate = DateTime.now();
+    var androidInitilize = new AndroidInitializationSettings('launch_iamge');
+    var iOSinitilize = new IOSInitializationSettings();
+    var initilizationsSettings =
+    new InitializationSettings(androidInitilize, iOSinitilize);
+    fltrNotification = new FlutterLocalNotificationsPlugin();
+    fltrNotification.initialize(initilizationsSettings,
+        onSelectNotification: notificationSelected);
+  }
+
+  Future notificationSelected(String payload) async {
+    // showDialog(
+    //   context: context,
+    //   builder: (context) => AlertDialog(
+    //     content: Text("Notification : $payload"),
+    //   ),
+    // );
+    // Navigator.of(context).pushNamed('/profile');
+  }
+
+  Future _showNotification(DateTime curdate, String workerName, String hirerName ) async {
+    var androidDetails = new AndroidNotificationDetails(
+        "Channel", "Worker", "Important One",
+        importance: Importance.Max);
+    var iSODetails = new IOSNotificationDetails();
+    var generalNotificationDetails =
+    new NotificationDetails(androidDetails, iSODetails);
+
+    var scheduledTime=curdate;
+    fltrNotification.schedule(1, "Appointment", "You Hire ${workerName} today",
+    scheduledTime, generalNotificationDetails);
   }
 
   @override
   Widget build(BuildContext context) {
-    var args =
-        ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
+
+    var args = ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
     Workers worker = args['curworker'];
     curHirer=args['curHirer'];
 
@@ -51,29 +83,44 @@ class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
           // print(curDate);
           // pickedDate = curDate;
           String date='${curDate.day}-${curDate.month}-${curDate.year}';
-          Request req=Request(
-            hirerCity: curHirer.city,
-            hirerName: curHirer.name,
-            hirerImg: curHirer.profileimg,
-            hirerPhone: curHirer.phnnumber,
-            workerPhone: worker.phnnumber,
-            workerCity: worker.city,
-            workerImg: worker.profileimg,
-            workerName: worker.name,
-            date: date,
-            isAccept: false,
-            workerUid: worker.uid,
-            hirerUid: curHirer.uid,
-          );
+          var req={
+            "hirercity": curHirer.city,
+            "hirername": curHirer.name,
+            "hirerimg": curHirer.profileimg,
+            "hirerphone": curHirer.phnnumber,
+            "workerphone": worker.phnnumber,
+            "workercity": worker.city,
+            "workerimg": worker.profileimg,
+            "workername": worker.name,
+            "date": date,
+            "isAccept": false,
+            "workerUid": worker.uid,
+            "hirerUid": curHirer.uid,
+          };
+          // Request req=Request(
+          //   hirerCity: curHirer.city,
+          //   hirerName: curHirer.name,
+          //   hirerImg: curHirer.profileimg,
+          //   hirerPhone: curHirer.phnnumber,
+          //   workerPhone: worker.phnnumber,
+          //   workerCity: worker.city,
+          //   workerImg: worker.profileimg,
+          //   workerName: worker.name,
+          //   date: date,
+          //   isAccept: false,
+          //   workerUid: worker.uid,
+          //   hirerUid: curHirer.uid,
+          // );
           worker.reqs.add(req);
           curHirer.reqs.add(req);
           // print(widget.curworker.reqs[0]);
           worker.reqs.forEach((element) async{
-            await DatabaseService(uid: worker.uid,isWorker: true).updateWorker(element);
+            await DatabaseService(uid: worker.uid,isWorker: true).updateReq(element);
           });
           curHirer.reqs.forEach((element) async{
-            await DatabaseService(uid: curHirer.uid,isWorker: false).updateWorker(element);
+            await DatabaseService(uid: curHirer.uid,isWorker: false).updateReq(element);
           });
+          _showNotification(curDate,worker.name,curHirer.name);
           Navigator.of(context).popUntil(ModalRoute.withName('/profile'));
         });
       }
@@ -258,4 +305,5 @@ class _WorkerDetailScreenState extends State<WorkerDetailScreen> {
             ),
           );
   }
+
 }

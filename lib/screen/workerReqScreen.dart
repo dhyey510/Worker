@@ -33,6 +33,7 @@ class _WorkerReqScreenState extends State<WorkerReqScreen> {
         // print(element['workername']);
         if (element['date'].compareTo(match) == 0) {
           if (!element['isAccept']) {
+            print("inside right");
             Request curReq = Request(
               hirerName: element['hirername'],
               hirerPhone: element['hirerphone'],
@@ -76,7 +77,7 @@ class _WorkerReqScreenState extends State<WorkerReqScreen> {
       });
       hr.reqs[reqlistindex]['isAccept'] = true;
       await DatabaseService(uid: hr.uid, isWorker: false)
-          .updateField(hr.reqs[reqlistindex]);
+          .updateUserData(hr);
       // if (hr.reqs.length > 0) {
       //   hr.reqs.forEach((element) async {
       //     print(hr.uid);
@@ -90,6 +91,7 @@ class _WorkerReqScreenState extends State<WorkerReqScreen> {
       await DatabaseService(uid: reqs[index].workerUid, isWorker: true)
           .updateField(obj.reqs[index]);
       print(obj.reqs.length);
+
       // if (obj.reqs.length > 0) {
       //   print("inside if");
       //   obj.reqs.forEach((element) async {
@@ -126,6 +128,7 @@ class _WorkerReqScreenState extends State<WorkerReqScreen> {
         : Container(
             width: double.infinity,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   padding: EdgeInsets.all(10),
@@ -148,6 +151,8 @@ class _WorkerReqScreenState extends State<WorkerReqScreen> {
                 SizedBox(
                   height: 30,
                 ),
+                Text('  All Requests',style: TextStyle(fontSize: 20,color: Colors.black,fontWeight: FontWeight.w800),),
+                SizedBox(height: 30,),
                 Container(
                   height: 300,
                   child: ListView.builder(

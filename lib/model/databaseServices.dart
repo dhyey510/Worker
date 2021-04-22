@@ -59,6 +59,7 @@ class DatabaseService {
   }
 
   Future updateWorker(dynamic req) async {
+    // print(req.workerName);
     // print("inside updateworker ${req['workername']}");
     return await obj.doc(uid).update({
       "reqs": FieldValue.arrayUnion([
@@ -257,6 +258,7 @@ class DatabaseService {
 
   Future<Hirer> get currHirer async {
     DocumentSnapshot ds = await obj.doc(uid).get();
+    print(ds.get('name'));
     return Hirer(
       uid: uid,
       name: ds.get('name'),

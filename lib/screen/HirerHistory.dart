@@ -66,33 +66,34 @@ class _HirerHistoryState extends State<HirerHistory> {
                     ),
                     elevation: 10,
                     onPressed: () async {
-                      print(reqs[index].workerUid);
                       Workers wr = await DatabaseService(
                               uid: reqs[index].workerUid, isWorker: true)
                           .currWorker;
-                      int indexofwr = wr.reqs.indexWhere((element) {
-                        if (element['date'] == reqs[index].date &&
-                            element['hirername']
-                                    .toString()
-                                    .compareTo(reqs[index].hirerName) ==
-                                0) {
-                          print("yess inside");
+                      wr.reqs.removeWhere((element) {
+                        if(element['date'].toString().compareTo(reqs[index].date)==0 && element['hirerUid'].toString().compareTo(reqs[index].hirerUid)==0){
+                          print("yess");
                           return true;
-                        } else {
+                        }else{
                           return false;
                         }
                       });
-
-                      await DatabaseService(uid: wr.uid, isWorker: true)
-                          .removeField(wr.reqs[indexofwr]);
-                      wr.reqs.removeAt(indexofwr);
+                      if (wr.reqs.length > 0) {
+                        print("inside if");
+                        wr.reqs.forEach((element) async {
+                          // print(sched[index].workerUid);
+                          await DatabaseService(uid: wr.uid, isWorker: true)
+                              .updateReq(element);
+                        });
+                      } else {
+                        print("inside else");
+                        await DatabaseService(uid: wr.uid, isWorker: true)
+                            .deletefeild();
+                      }
 
                       await DatabaseService(uid: hirer.uid, isWorker: false)
                           .removeField(hirer.reqs[index]);
                       hirer.reqs.removeAt(index);
                       reqs.removeAt(index);
-
-                      print(hirer.reqs.length);
 
                       Navigator.of(context)
                           .popAndPushNamed(Profile.profileRoute);

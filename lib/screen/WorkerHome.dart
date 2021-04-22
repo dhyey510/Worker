@@ -50,7 +50,7 @@ class _WorkerHomeState extends State<WorkerHome> {
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.schedule),
-                title: Text('History'),
+                title: Text('Schedule'),
               ),
             ],
             onTap: (index) {
