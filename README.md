@@ -31,4 +31,4 @@ Worker App is a Flutter-based application designed to connect workers and hirers
 
 ## License
 
-This project is licensed under the [MIT License](License).
+This project is licensed under the [MIT License](LICENSE).
